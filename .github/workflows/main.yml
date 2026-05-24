@@ -35,8 +35,7 @@ jobs:
 
     - name: Build
       run: |
-        make O=out exynos9830_defconfig
-        make O=out z3s.config
+        make O=out exynos9830-r8slte_defconfig
         make O=out --jobs=$(nproc)
 
     - name: Build AnyKernel package
