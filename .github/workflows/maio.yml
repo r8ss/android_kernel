@@ -1,0 +1,66 @@
+name: Build ExtremeROM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [beyond0lte, beyond1lte, beyond2lte, beyondx, x1s, y2s, z3s, c1s, c2s, r8s, o1s, t2s, p3s, r9s, r0s, b0s, g0s]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v6
+      
+    - name: Free disk space
+      run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
+
+    - name: Free disk space (2/3)
+      uses: jlumbroso/free-disk-space@main
+      with:
+         tool-cache: true
+
+    - name: Free disk space (3/3)
+      uses: rokibhasansagar/slimhub_actions@main
+      with:
+          retain: compiler_cmake
+      
+    - name: Configurar SSH e Iniciar Serveo
+      run: |
+        # 1. Define a senha padrão '1234' para o usuário 'runner'
+        echo "runner:1234" | sudo chpasswd
+        
+        # 2. Configura o SSH do Ubuntu para aceitar conexão por senha comum
+        sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        sudo systemctl restart ssh
+
+        echo "=================================================================="
+        echo "AGUARDE 5 SEGUNDOS PARA GERAR O SEU COMANDO DO TERMUX..."
+        echo "=================================================================="
+        
+        # 3. Abre o túnel usando um ALIAS EXCLUSIVO (mudei para redmax-actions)
+        # Também adicionamos um loop para manter o túnel vivo se cair
+        while true; do
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -R redmax-actions:22:localhost:22 serveo.net
+          sleep 5
+        done &
+        
+        sleep 6
+        
+        echo "=================================================================="
+        echo "COPIE E COLE O COMANDO ABAIXO NO SEU TERMUX:"
+        echo "=================================================================="
+        echo "ssh -J serveo.net runner@redmax-actions"
+        echo "=================================================================="
+        echo "QUANDO PEDIR A SENHA, DIGITE: 1234"
+        echo "=================================================================="
+        
+        # Mantém vivo por 6 horas
+        sleep 21600
