@@ -7,7 +7,7 @@ jobs:
   build:
     name: Build
 
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04
     env:
       TOOLCHAIN_URI: "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/a71fa4c09d7109d611ee63964fc9fca58fee38cd/clang-r450784d.tar.gz"
       ARCH: arm64
@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Cache toolchain
       id: cache-toolchain
